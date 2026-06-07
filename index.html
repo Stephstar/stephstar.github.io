@@ -22,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Odong Stephen | Biomedical Engineer &amp; Health-Tech Innovator">
     <meta name="twitter:description" content="Building healthcare technologies for underserved communities.">
-    <meta name="twitter:image" content="https://stephstar.github.io/og.png">
+    <meta name="twitter:image" content="https://stephstar.github.io/portfolio/og.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1164,10 +1164,39 @@
 <body>
     <div id="readingProgress"></div>
 
+    <!-- ===== PROFILE PHOTO LIGHTBOX ===== -->
+    <div id="photoLightbox" style="
+        position:fixed;inset:0;z-index:9999;
+        background:rgba(0,0,0,0.88);
+        display:flex;align-items:center;justify-content:center;
+        opacity:0;visibility:hidden;
+        transition:opacity 0.35s ease,visibility 0.35s ease;
+        backdrop-filter:blur(6px);cursor:zoom-out;
+    ">
+        <img src="newer.png" alt="Odong Stephen" id="lightboxImg" style="
+            max-width:90vw;max-height:90vh;
+            border-radius:16px;
+            box-shadow:0 24px 80px rgba(0,0,0,0.6);
+            transform:scale(0.88);
+            transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+            cursor:default;
+        " onclick="event.stopPropagation()">
+        <button onclick="closeLightbox()" style="
+            position:absolute;top:20px;right:24px;
+            background:rgba(255,255,255,0.15);
+            border:1px solid rgba(255,255,255,0.3);
+            border-radius:50%;width:44px;height:44px;
+            color:#fff;font-size:1.3rem;cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            transition:background 0.2s ease;
+        " onmouseover="this.style.background='rgba(255,255,255,0.28)'"
+           onmouseout="this.style.background='rgba(255,255,255,0.15)'">&#x2715;</button>
+    </div>
+
     <!-- ===== NAVIGATION ===== -->
     <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="#" class="nav-logo"><img src="newer.png" alt="Odong Stephen"></a>
+            <a href="#" class="nav-logo" onclick="openLightbox(event)" title="Click to view photo" style="cursor:zoom-in;"><img src="newer.png" alt="Odong Stephen"></a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#about">About</a></li>
                 <li><a href="#skills">Skills</a></li>
@@ -1377,17 +1406,6 @@
                         <p class="project-desc">
                             A virtual reality platform designed to enhance biomedical engineering education through immersive 3D simulations. The project aims to make complex anatomical and physiological concepts accessible through interactive VR experiences — especially valuable in resource-constrained learning environments.
                         </p>
-                        <div class="project-tech">
-                            <span>Unity</span>
-                            <span>C#</span>
-                            <span>XR Interaction Toolkit</span>
-                            <span>3D Modeling</span>
-                        </div>
-                        <div class="project-meta">
-                            <strong>Problem:</strong> Limited access to cadavers and expensive lab equipment for anatomy education.<br>
-                            <strong>Impact:</strong> Making BME education more engaging and accessible in Ugandan universities.<br>
-                            <strong>Lesson:</strong> User testing is crucial; VR in education requires careful pedagogical design.
-                        </div>
                         <button class="project-view-btn" onclick="openModal('vr')">View Details →</button>
                     </div>
                 </div>
@@ -1400,17 +1418,6 @@
                         <p class="project-desc">
                             A comprehensive telemedicine web application built to address healthcare access challenges in underserved communities. Features secure video consultations, electronic health records management, and an intuitive interface designed for users with varying digital literacy levels.
                         </p>
-                        <div class="project-tech">
-                            <span>React</span>
-                            <span>Node.js</span>
-                            <span>WebRTC</span>
-                            <span>PostgreSQL</span>
-                        </div>
-                        <div class="project-meta">
-                            <strong>Problem:</strong> Rural patients travel long distances for basic consultations.<br>
-                            <strong>Impact:</strong> Bridges the gap between rural patients and healthcare providers.<br>
-                            <strong>Lesson:</strong> Offline-first considerations are critical where internet connectivity is unreliable.
-                        </div>
                         <button class="project-view-btn" onclick="openModal('telehealth')">View Details →</button>
                     </div>
                 </div>
@@ -1423,17 +1430,6 @@
                         <p class="project-desc">
                             A project supervision and management platform designed to streamline MSc and undergraduate research workflows. The system helps students organize milestones, track progress, manage documentation, and maintain effective communication with supervisors through a centralized digital workspace.
                         </p>
-                        <div class="project-tech">
-                            <span>React</span>
-                            <span>Firebase</span>
-                            <span>Node.js</span>
-                            <span>Project Management</span>
-                        </div>
-                        <div class="project-meta">
-                            <strong>Problem:</strong> Many student research projects suffer from poor organization, missed deadlines, and limited visibility of progress for supervisors.<br>
-                            <strong>Impact:</strong> Improves project tracking, communication, and accountability between students and supervisors while reducing administrative overhead.<br>
-                            <strong>Lesson:</strong> Successful project management tools must balance powerful functionality with simplicity, ensuring users can focus on research rather than learning complex software.
-                        </div>
                         <button class="project-view-btn" onclick="openModal('projectflow')">View Details →</button>
                     </div>
                 </div>
@@ -1983,7 +1979,10 @@
         });
 
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Escape') {
+                closeModal();
+                closeLightbox();
+            }
         });
 
         /* ===== TOAST ===== */
@@ -2104,6 +2103,30 @@ backToTop.addEventListener('click', function() {
                     });
                 }, 650);
             });
+        });
+
+        /* ===== PROFILE PHOTO LIGHTBOX ===== */
+        function openLightbox(e) {
+            e.preventDefault();
+            var lb = document.getElementById('photoLightbox');
+            var img = document.getElementById('lightboxImg');
+            lb.style.opacity = '1';
+            lb.style.visibility = 'visible';
+            setTimeout(function() { img.style.transform = 'scale(1)'; }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+            var lb = document.getElementById('photoLightbox');
+            var img = document.getElementById('lightboxImg');
+            img.style.transform = 'scale(0.88)';
+            setTimeout(function() {
+                lb.style.opacity = '0';
+                lb.style.visibility = 'hidden';
+                document.body.style.overflow = '';
+            }, 150);
+        }
+        document.getElementById('photoLightbox').addEventListener('click', function(e) {
+            if (e.target === this) closeLightbox();
         });
 
         /* ===== OFFLINE STYLES FOR ROTATING TEXT ===== */
